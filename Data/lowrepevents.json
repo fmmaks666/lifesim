@@ -1,0 +1,27 @@
+{
+
+"stealmoney": {
+"description": "Someone stole my money...",
+"type": "money",
+"result": "//2"
+},
+
+"wetfloor": {
+"description": "Today, at Office, I didn't seen wet floor warning...I damaged myself...",
+"type": "hp",
+"result": "-5"
+},
+
+"terrorist": {
+"description": "Some terrorist throwed bomb to my window...",
+"type": "hp",
+"result": "-10"
+},
+
+"photo": {
+"description": "Someone posted image in which I hugging pillow with anime Girl, but that photo is fake...",
+"type": "rep",
+"result": "-15"
+}
+
+}

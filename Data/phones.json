@@ -1,0 +1,33 @@
+{
+
+"bphone": {
+"name": "bPhone",
+"price": 1000,
+"rep": 7
+},
+
+"xui": {
+"name": "XUI-Z",
+"price": 2000,
+"rep": "4"
+},
+
+"rphone15": {
+"name": "RichPhone 15 X, S, XLL, Pro Max, Professional, Limited Edition",
+"price": 10000,
+"rep": 14
+},
+
+"jokiamega": {
+"name": "Jokia 3310",
+"price": 1,
+"rep": 0
+},
+
+"rphone16": {
+"name": "RichPhone 16 X, S, XLL, Pro Max, Professional, Limited Edition",
+"price": 20000,
+"rep": 14
+}
+
+}

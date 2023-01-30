@@ -1,0 +1,14 @@
+{
+
+"kde": {
+"name": "The KDE Community",
+"goodrep": true,
+"repbonus": 0.1
+},
+"google": {
+"name": "Google",
+"goodrep": false,
+"repbonus": 0.5
+}
+
+}

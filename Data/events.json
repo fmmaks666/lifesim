@@ -1,0 +1,19 @@
+{
+
+"anime": {
+"description": "Today I watched anime on TV",
+"type": "hp",
+"result": "+5"
+},
+"manga": {
+"description": "Someone on work leaved Manga on table, I read it, I was cool",
+"type": "hp",
+"result": "+2"
+},
+"linux": {
+"description": "At morning my mood was bad, but now when I used Linux at home I'm happy",
+"type": "hp",
+"result": "+1"
+}
+
+}
