@@ -3,9 +3,10 @@ import random as rnd
 import inquirer as inq
 import platform as plf
 import os
+import time
 from saving import Saving
 
-MAX_DATA = 30 #For example: cars.json have 150 cars, It's a lot, So MAX_DATA is sets how many objects Start.generate() can add to shops
+MAX_DATA = 30 # For example: cars.json have 150 cars, It's a lot, So MAX_DATA is sets how many objects Start.generate() can return
 WORK_EXP_CYCLE = 3
 BILLS_CYCLE = 6
 AGE_CYCLE = 12
@@ -25,10 +26,13 @@ class Player:
         self.name = name
         self.rep = rnd.randint(15, 20)
         self.tired = False
-        self.money = rnd.randint(500, 2000)
+        #self.money = rnd.randint(500, 2000)
+        self.money = 9999999999
         self.age = rnd.randint(21, 35)
         self.hp = rnd.randint(1, 15)
         self.workexp = rnd.randint(0, 10)
+        self.owned = {"cars": [], "phones": [], "houses": []}
+        self.ownedValue = 0
 class Start:
         # Donate To: Reputation Formula: (Money/Reputation)*ReputationBonus*10//5
     def generateNoLimit():
@@ -45,10 +49,19 @@ class Start:
                 return(data[:MAX_DATA])
             return data
 class Game:
-    def Menu(player):
+    def __init__(self, player, world):
+        self.player = player
+        self.world = world
+
+    def clear():
+        os.system('cls' if os.name == 'nt' else 'clear')
+    def Menu(self, player):
+        def __init__(self):
+            pass
         while True:
+            Game.clear()
             print(f"{player.name} ->\nMoney: {player.money}$, Reputation: {player.rep}, Age: {player.age}, Health: {player.hp}")
-            menuChoices = ["Buy Phones", "Buy Cars", "Buy Houses", "Owned", "Donate", "Visit Hospital", "Sleep", "Save", "Exit"]
+            menuChoices = ["Buy Phones", "Buy Cars", "Buy Houses", "View Owned", "Donate", "Visit Hospital", "Change Work", "Sleep", "Save", "Exit"]
             questions = [
                 inq.List(carousel=True, name = "Choice", message="What to do",
                 choices=menuChoices,),]
@@ -56,14 +69,16 @@ class Game:
             if answers["Choice"] == "Exit":
                 os.system('cls' if os.name == 'nt' else 'clear')
                 quit()
-            if answers["Choice"] == "Save":
+            elif answers["Choice"] == "Save":
                 Saving.save(player, "TestSave")
-                with open(datafile, "r") as outfile:
-                    data = js.load(outfile)
-                    photo = data["photo"]
-                    print(photo["description"])
-                    outfile.close()
-
+            elif answers["Choice"] == "Buy Cars":
+                Game.buy("cars", self.player, self.world)
+            elif answers["Choice"] == "Buy Phones":
+                Game.buy("phones", self.player, self.world)
+            elif answers["Choice"] == "Buy Houses":
+                Game.buy("houses", self.player, self.world)
+            elif answers["Choice"] == "Owned":
+                Game.viewOwned(self.player)
     def changeWork():
         pass
     def eventChooser(datafile):
@@ -75,6 +90,51 @@ class Game:
                 for info in event:
                     print(event[info])
         outfile.close()
+    def buy(type, player, world):
+        Game.clear()
+        if len(world.reference[type]) != 0:
+            questions = [
+                inq.List(carousel=True, name = "item", message="Buy",
+                choices=world.reference[type]),]
+            print(f"=Buy {type.capitalize()}=")
+            answers = inq.prompt(questions)
+            price = world.worldData[type][world.reference[type][answers["item"]]]["price"]
+            print(answers["item"].strip() + ", Costs " + str(world.worldData[type][world.reference[type][answers["item"]]]["price"]) + "$")
+            if player.money < price:
+                print("Not Enough money!\n")
+            else:
+                buyOk = inq.confirm("Do you want to buy that?", default=False)
+                if buyOk:
+                    player.ownedValue += price
+                    player.owned[type].append(answers["item"])
+                    world.reference[type].pop(answers["item"])
+                    player.money -= price
+                    print("Bought successfully!")
+                    time.sleep(2)
+        else:
+            print(f"=Buy {type.capitalize()}=")
+            print(f"No avaible {type.capitalize()}!")
+            time.sleep(2)
+    def viewOwned(player):
+        Game.clear()
+        print("=Owned=")
+        print(f"Owned Value: {player.ownedValue}$")
+        for category in player.owned:
+            print(f"={category.capitalize()}=")
+            for item in player.owned[category]:
+                print("  " + item)
+        input("<-Back")
+    def hospital(player):
+        Game.clear()
+        print("Hospital")
+        if player.hp == 15:
+            print("No need to visit hospital!")
+            time.sleep(2)
+        else:
+            questions = [
+                inq.List(carousel=True, name = "heal", message="Heal",
+                choices=menuChoices,),]
+            answers = inq.prompt(questions)
 
 class World:
     def __init__(self, cars, phones, houses, works, defWork, donate):
@@ -87,10 +147,14 @@ class World:
         # TEMP: Reference Lists, to be fixed
         self.things = [self.cars, self.phones, self.houses, self.works, self.donate]
         self.i = 0
-        self.thingsNames = ["cars", "phones", "works", "donate"]
-        self.reference = {"cars": "", "phones": "", "works": "", "donate": ""}
-        print(self.reference[0])
+        self.thingsNames = ["cars", "phones", "houses", "works", "donate"]
+        self.worldData = {}
+        self.reference = {"cars": {}, "phones": {}, "houses": {}, "works": {}, "donate": {}}
         for thing in self.things:
+            self.worldData[self.thingsNames[self.i]] = thing
             for entry in thing:
-                thing.get(entry).get("name")
+                self.refThing = entry
+                self.refChange = self.reference.get(self.thingsNames[self.i])
+                self.refChange[thing[entry]["name"]] = self.refThing
+            if self.i != len(self.thingsNames) - 1:
                 self.i += 1

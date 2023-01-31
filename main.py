@@ -20,10 +20,11 @@ def main():
             playerName = "BadBoy"
         player = Player(playerName)
     world = World(Start.generate(f"Data{separator}cars.json"), Start.generate(f"Data{separator}phones.json"), Start.generate(f"Data{separator}houses.json"), Start.generate(f"Data{separator}works.json"), Start.generate(f"Data{separator}defaultwork.json"), Start.generate(f"Data{separator}donateto.json"))
-    Game.Menu(player)
+    play = Game(player, world)
+    play.Menu(player)
 
 
-#Entry poit
+# Entry point
 if __name__ == "__main__":
     main()
 else:
