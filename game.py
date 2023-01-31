@@ -30,9 +30,15 @@ class Player:
         self.money = 9999999999
         self.age = rnd.randint(21, 35)
         self.hp = rnd.randint(1, 15)
+        self.day = 0
         self.workexp = rnd.randint(0, 10)
         self.owned = {"cars": [], "phones": [], "houses": []}
         self.ownedValue = 0
+        self.workcycle = 0
+        self.billcycle = 0
+        self.agecycle = 0
+        self.bonuscycle = 0
+        self.deathchance = 0
 class Start:
         # Donate To: Reputation Formula: (Money/Reputation)*ReputationBonus*10//5
     def generateNoLimit():
@@ -60,7 +66,7 @@ class Game:
             pass
         while True:
             Game.clear()
-            print(f"{player.name} ->\nMoney: {player.money}$, Reputation: {player.rep}, Age: {player.age}, Health: {player.hp}")
+            print(f"{player.name} ->\nMoney: {player.money}$, Reputation: {player.rep}, Age: {player.age}, Health: {player.hp}, Day: {player.day}")
             menuChoices = ["Buy Phones", "Buy Cars", "Buy Houses", "View Owned", "Donate", "Visit Hospital", "Change Work", "Sleep", "Save", "Exit"]
             questions = [
                 inq.List(carousel=True, name = "Choice", message="What to do",
@@ -77,8 +83,12 @@ class Game:
                 Game.buy("phones", self.player, self.world)
             elif answers["Choice"] == "Buy Houses":
                 Game.buy("houses", self.player, self.world)
-            elif answers["Choice"] == "Owned":
+            elif answers["Choice"] == "View Owned":
                 Game.viewOwned(self.player)
+            elif answers["Choice"] == "Visit Hospital":
+                Game.hospital(self.player)
+            elif answers["Choice"] == "Sleep":
+                Game.nextDay(self.player)
     def changeWork():
         pass
     def eventChooser(datafile):
@@ -126,15 +136,41 @@ class Game:
         input("<-Back")
     def hospital(player):
         Game.clear()
-        print("Hospital")
+        print("=Hospital=")
         if player.hp == 15:
             print("No need to visit hospital!")
             time.sleep(2)
         else:
             questions = [
                 inq.List(carousel=True, name = "heal", message="Heal",
-                choices=menuChoices,),]
+                choices=["5HP", "10HP", "15HP"]),]
             answers = inq.prompt(questions)
+            if answers["heal"] == "5HP":
+                price = 50
+                heal = 5
+            elif answers["heal"] == "10HP":
+                price = 120
+                heal = 10
+            elif answers["heal"] == "15HP":
+                price = 200
+                heal = 15
+            if player.money < price:
+                print("Not Enough money!")
+            else:
+                buyOk = inq.confirm("Do you want to buy heal?", default=False)
+                if buyOk:
+                    player.hp += heal
+                    if player.hp > 15:
+                        player.hp = 15
+                    player.money -= price
+                    print("Bought successfully!")
+                    time.sleep(2)
+
+    def nextDay(player):
+        Game.clear()
+        print("Sleeping...")
+        time.sleep(2)
+        player.day += 1
 
 class World:
     def __init__(self, cars, phones, houses, works, defWork, donate):
