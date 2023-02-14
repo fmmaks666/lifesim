@@ -10,7 +10,7 @@ if plf.system() == "Windows":
     separator = "\\"
 
 def main():
-    print("Welcome! This is LifeSim by fmmaks. Type character name to start!")
+    print("Welcome! This is LifeSim by fmmaks.")
     loadsave = input("Do You want to load saved game? (y/N) ").lower()
     if loadsave == "y" or loadsave == "yes":
         Saving.load()
@@ -18,10 +18,10 @@ def main():
         playerName = input("Enter character name[>} ")
         if playerName == "" or playerName == " ":
             playerName = "BadBoy"
-        player = Player(playerName)
-    world = World(Start.generate(f"Data{separator}cars.json"), Start.generate(f"Data{separator}phones.json"), Start.generate(f"Data{separator}houses.json"), Start.generate(f"Data{separator}works.json"), Start.generate(f"Data{separator}defaultwork.json"), Start.generate(f"Data{separator}donateto.json"))
-    play = Game(player, world)
-    play.Menu(player)
+        world = World(Start.generate(f"Data{separator}cars.json"), Start.generate(f"Data{separator}phones.json"), Start.generate(f"Data{separator}houses.json"), Start.generate(f"Data{separator}works.json"), Start.generate(f"Data{separator}defaultwork.json"), Start.generate(f"Data{separator}donateto.json"))
+        player = Player(playerName, world.defWork)
+        play = Game(player, world)
+        play.Menu(player)
 
 
 # Entry point

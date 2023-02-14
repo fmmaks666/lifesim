@@ -2,9 +2,19 @@
 
 "fmccm": {
 "name": "fmCreation: CM",
-"worlexp": 5,
 "salary": 350,
 "bonus": 30
+},
+
+"school": {
+"name": "School",
+"salary": 200,
+"bonus": 0
+},
+"fglab": {
+"name": "Future Gadget Laboratory",
+"salary": 250,
+"bonus": 10
 }
 
 }

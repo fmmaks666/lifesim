@@ -6,7 +6,7 @@
 "result": "+5"
 },
 "manga": {
-"description": "Someone on work leaved Manga on table, I read it, I was cool",
+"description": "Someone on work leaved Manga on table, I read it, It was cool",
 "type": "hp",
 "result": "+2"
 },
@@ -14,6 +14,16 @@
 "description": "At morning my mood was bad, but now when I used Linux at home I'm happy",
 "type": "hp",
 "result": "+1"
+},
+"word": {
+"description": "Today I seen my Boss, and said him Good Day!, He now respects me",
+"type": "rep",
+"result": "+1"
+},
+"gift": {
+"description": "Someone Gifted me 250$",
+"type": "money",
+"result": "+250"
 }
 
 }

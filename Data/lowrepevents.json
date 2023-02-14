@@ -3,7 +3,7 @@
 "stealmoney": {
 "description": "Someone stole my money...",
 "type": "money",
-"result": "//2"
+"result": "/2"
 },
 
 "wetfloor": {

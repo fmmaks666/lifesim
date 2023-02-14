@@ -4,6 +4,7 @@ import inquirer as inq
 import platform as plf
 import os
 import time
+import math
 from saving import Saving
 
 MAX_DATA = 30 # For example: cars.json have 150 cars, It's a lot, So MAX_DATA is sets how many objects Start.generate() can return
@@ -22,16 +23,16 @@ if plf.system() == "Windows":
 # FIXME: Current Reputation bonus (Donate To) is very unbalanced, so it need to be balanced
 
 class Player:
-    def __init__(self, name):
+    def __init__(self, name, defWork):
         self.name = name
         self.rep = rnd.randint(15, 20)
-        self.tired = False
-        #self.money = rnd.randint(500, 2000)
-        self.money = 9999999999
+        self.money = rnd.randint(500, 2000)
+        #self.money = 9999999999
         self.age = rnd.randint(21, 35)
         self.hp = rnd.randint(1, 15)
         self.day = 0
         self.workexp = rnd.randint(0, 10)
+        self.workBonusLevel = 2
         self.owned = {"cars": [], "phones": [], "houses": []}
         self.ownedValue = 0
         self.workcycle = 0
@@ -39,6 +40,13 @@ class Player:
         self.agecycle = 0
         self.bonuscycle = 0
         self.deathchance = 0
+        if len(defWork) != 0:
+            self.works = []
+            for work in defWork:
+                self.works.append(work)
+            self.work = defWork[self.works[rnd.randint(0, len(self.works) - 1)]]
+        else:
+            self.work = defWork
 class Start:
         # Donate To: Reputation Formula: (Money/Reputation)*ReputationBonus*10//5
     def generateNoLimit():
@@ -62,8 +70,6 @@ class Game:
     def clear():
         os.system('cls' if os.name == 'nt' else 'clear')
     def Menu(self, player):
-        def __init__(self):
-            pass
         while True:
             Game.clear()
             print(f"{player.name} ->\nMoney: {player.money}$, Reputation: {player.rep}, Age: {player.age}, Health: {player.hp}, Day: {player.day}")
@@ -94,12 +100,10 @@ class Game:
     def eventChooser(datafile):
         with open(datafile, "r") as outfile:
             data = js.load(outfile)
-            print(len(data))
             for event in data:
                 event = data[event]
-                for info in event:
-                    print(event[info])
         outfile.close()
+        return rnd.choice(list(data.items()))
     def buy(type, player, world):
         Game.clear()
         if len(world.reference[type]) != 0:
@@ -112,13 +116,17 @@ class Game:
             print(answers["item"].strip() + ", Costs " + str(world.worldData[type][world.reference[type][answers["item"]]]["price"]) + "$")
             if player.money < price:
                 print("Not Enough money!\n")
+                time.sleep(2)
             else:
                 buyOk = inq.confirm("Do you want to buy that?", default=False)
                 if buyOk:
                     player.ownedValue += price
                     player.owned[type].append(answers["item"])
-                    world.reference[type].pop(answers["item"])
                     player.money -= price
+                    player.rep -= world.worldData[type][world.reference[type][answers["item"]]]["rep"]
+                    world.reference[type].pop(answers["item"])
+                    if player.rep < 0:
+                        player.rep = 0
                     print("Bought successfully!")
                     time.sleep(2)
         else:
@@ -156,8 +164,9 @@ class Game:
                 heal = 15
             if player.money < price:
                 print("Not Enough money!")
+                time.sleep(2)
             else:
-                buyOk = inq.confirm("Do you want to buy heal?", default=False)
+                buyOk = inq.confirm(f"Do you want to buy some medicine ({price}$)?", default=False)
                 if buyOk:
                     player.hp += heal
                     if player.hp > 15:
@@ -166,11 +175,48 @@ class Game:
                     print("Bought successfully!")
                     time.sleep(2)
 
+    def work(player):
+        salary =  rnd.randint(math.ceil(player.work["salary"] - player.work["salary"]/8), math.ceil(player.work["salary"] + player.work["salary"]/8))
+        bonus = player.workBonusLevel * player.work["bonus"]
+        player.money += salary + bonus
+        Game.clear()
+        print("=Work=")
+        print(f"Today's salary is {salary}$")
+        chance = rnd.randint(1, 10)
+        if chance >= 6:
+            if player.rep < 5:
+                event = Game.eventChooser(f"Data{separator}lowrepevents.json")[1]
+            else:
+                event = Game.eventChooser(f"Data{separator}events.json")[1]
+            print(event["description"])
+            values = {"hp": "Health", "money": "Money", "rep": "Reputation"}
+            print(values[event["type"]], "\n", event["result"])
+            match event["type"]:
+                case "hp":
+                    player.hp = round(eval(str(player.hp) + event["result"]))
+                    if player.hp > 15:
+                        player.hp = 15
+                    elif player.hp < 0:
+                        player.hp = 0
+                case "money":
+                    player.money = round(eval(str(player.money) + event["result"]))
+                    if player.money < 0:
+                        player.money = 0
+                case "rep":
+                    player.rep = round(eval(str(player.rep) + event["result"]))
+                    if player.rep > 20:
+                        player.rep = 20
+                    elif player.rep < 0:
+                        player.rep = 0
+
+        input("Press enter to continue...")
+
     def nextDay(player):
         Game.clear()
         print("Sleeping...")
         time.sleep(2)
         player.day += 1
+        Game.work(player)
 
 class World:
     def __init__(self, cars, phones, houses, works, defWork, donate):
