@@ -1,4 +1,10 @@
 {
+"trader":{
+"name": "MushTraders",
+"salary": 80,
+"workexp": 5,
+"bonus": 80
+},
 
 "studio": {
 "name": "Anime Of Year, LLC",

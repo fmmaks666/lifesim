@@ -28,6 +28,18 @@
 "name": "RichPhone 16 X, S, XLL, Pro Max, Professional, Limited Edition",
 "price": 20000,
 "rep": 14
+},
+
+"bbphone": {
+"name": "BBphone",
+"price": 120,
+"rep": 2
+},
+
+"shindows": {
+"name": "Shindows Phone",
+"price": 9999,
+"rep": 5
 }
 
 }
