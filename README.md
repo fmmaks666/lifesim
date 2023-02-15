@@ -5,7 +5,7 @@
 **15.02.2023**
 - Implemented "Change Work"
 - Added "Not Now" option to all buy menus
-- Changed Max HP&Reputation: Max Health is 30, and Max Reputation is 50, low reputation is 25
+- Changed Max HP&Reputation: Now Max Health is 30, and Max Reputation is 50, low reputation is 25
 - Healing at Hospital are now limited to 1 time per day
-- Added new Options to Hospital
+- Added new healing Options to Hospital
 - New Phones, Thanks to @D__a@mastodon.social 
