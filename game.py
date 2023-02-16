@@ -7,10 +7,10 @@ import time
 import math
 from saving import Saving
 
-WORK_EXP_CYCLE = 3
+WORK_EXP_CYCLE = 4
 BILLS_CYCLE = 6
 AGE_CYCLE = 12
-WORK_BONUS_CYCLE = 6
+WORK_BONUS_CYCLE = 2
 DEATH_CHANCE_BASE = 0
 
 separator = "/"
@@ -19,7 +19,7 @@ if plf.system() == "Windows":
 
 # TODO: Finish Project!!
 # TODO: Make better balance
-# OPTIMIZE: Shops, Work, Donate: Get Rid of "Reference Lists"
+# OPTIMIZE: Shops, Work, Donate: Get Rid of "Reference Lists", Transfer some if .. else to match .. case
 # FIXME: Current Reputation bonus (Donate To) is very unbalanced, so it need to be balanced
 
 class Player:
@@ -27,7 +27,7 @@ class Player:
         self.name = name
         self.rep = rnd.randint(35, 50)
         self.money = rnd.randint(500, 2000)
-        #self.money = 99999999999999999
+        self.money = 99999999999999999
         self.age = rnd.randint(21, 35)
         self.hp = rnd.randint(1, 30)
         self.day = 0
@@ -40,7 +40,11 @@ class Player:
         self.agecycle = 0
         self.bonuscycle = 0
         self.deathchance = 0
+        self.dead = False
+        self.ended = False
+        self.deathReason = ""
         self.vistedHospital = False
+        self.changedWork = False
         if len(defWork) != 0:
             self.works = []
             for work in defWork:
@@ -49,7 +53,7 @@ class Player:
         else:
             self.work = defWork
 class Start:
-        # Donate To: Reputation Formula: (Money/Reputation)*ReputationBonus*10//5
+        # Donate To: Reputation Formula: Reputation*(Money/10000)*ReputationBonus
     def generateNoLimit():
         with open(datafile, "r") as outfile:
             data = js.load(outfile)
@@ -70,6 +74,9 @@ class Game:
     def Menu(self, player):
         while True:
             Game.clear()
+            isDead = Game.lifeCheck(self.player)
+            if isDead:
+                return
             print(f"{player.name} ->\nMoney: {player.money}$, Reputation: {player.rep}, Age: {player.age}, Health: {player.hp}, Day: {player.day}")
             menuChoices = ["Buy Phones", "Buy Cars", "Buy Houses", "View Owned", "Donate", "Visit Hospital", "Change Work", "Sleep", "Save", "Exit"]
             questions = [
@@ -95,24 +102,91 @@ class Game:
                 Game.nextDay(self.player)
             elif answers["Choice"] == "Change Work":
                 Game.changeWork(self.player, self.world)
+            elif answers["Choice"] == "Donate":
+                Game.donate(self.player, self.world)
+    def lifeCheck(player, fromAge = False):
+        war = rnd.randint(1, 1000)
+        if war == 500:
+            player.deathReason = "Nuclear Warfare just started, You were killed by Explosion"
+            player.dead = True
+            return player.dead
+        if fromAge:
+            player.deathReason = "Age. We hope Your life was Successful!"
+            player.dead = True
+            return player.dead
+        if player.hp <= 0:
+            player.deathReason = "Something went wrong with Your Health."
+            player.dead = True
+            return player.dead
+        if player.rep <= 0:
+            player.deathReason = "People disrespected You."
+            player.ended = True
+            return player.ended
+        if player.money <= 0:
+            player.deathReason = "You don't have any money to live."
+            player.ended = True
+            return player.ended
+        return False
+    def donate(player, world):
+        Game.clear()
+        print("=Donate=")
+        if player.money == 0:
+            print("You don't have money")
+            return time.sleep(2)
+        if len(world.reference["donate"]) != 0:
+            choices = world.reference["donate"]
+            choices["Not Now"] = "close"
+            questions = [
+            inq.List(carousel=True, name = "item", message="Apply to",
+            choices=choices),]
+            answers = inq.prompt(questions)
+            del world.reference["donate"]["Not Now"]
+            if answers["item"] == "Not Now":
+                return
+            company =  world.worldData["donate"][world.reference["donate"][answers["item"]]]
+            name = company["name"]
+            doDonation = inq.confirm(f"Donate to {name}?", default=False)
+            validAmount = False
+            while not validAmount:
+                money = [inq.Text("amount", message = "How many to donate?")]
+                money = inq.prompt(money)
+                if money["amount"].isdigit():
+                    validAmount = True
+                else:
+                    print("Enter valid Amount!")
+            if (player.money - int(money["amount"])) < 0:
+                print("You don't have enough money!")
+                return time.sleep(2)
+            player.money -= abs(round((int(money["amount"]))))
+            player.money
+            if company["goodrep"]:
+                player.rep += math.ceil(player.rep*(int(money["amount"])/10000)*company["repbonus"])
+            else:
+                player.rep -= math.ceil(player.rep*(int(money["amount"])/10000)*company["repbonus"])
+            if player.rep > 50:
+                player.rep = 50
+            print("Donated Successful")
+            time.sleep(2)
     def changeWork(player, world):
         Game.clear()
         print("=Change Work=")
         if len(world.reference["works"]) != 0:
-            time.sleep(1)
             name = player.work["name"]
             salary = player.work["salary"]
             if player.work["bonus"] <= 0:
                 bonus = ", without bonuses."
             else:
                 bonus = ", with bonuses."
-            print(f"I'm working at {name}, Averange salary is {salary}{bonus} My work experience is {player.workexp}")
+            if player.changedWork:
+                return input("You can't change work 2 times, Press enter to continue...")
+            print(f"I'm working at {name}, Averange salary is {salary}${bonus} My work experience is {player.workexp}")
             choices = world.reference["works"]
             choices["Not Now"] = "close"
             questions = [
             inq.List(carousel=True, name = "item", message="Apply to",
             choices=choices),]
             answers = inq.prompt(questions)
+            del world.reference["works"]["Not Now"]
             if answers["item"] == "Not Now":
                 return
             newWork = world.worldData["works"][world.reference["works"][answers["item"]]]
@@ -123,7 +197,7 @@ class Game:
                 newBonusText = ", without bonuses."
             else:
                 newBonusText = ", with bonuses."
-            print(f"Work at {newName}, Averange salary: {newSalary}{newBonusText}")
+            print(f"Work at {newName}, Averange salary: {newSalary}${newBonusText}")
             inq.confirm(f"Apply to {newName}?", default=True)
             if name == newName:
                 print("I'm already working here")
@@ -135,6 +209,7 @@ class Game:
             player.work["salary"] = int(newSalary)
             player.work["bonus"] = int(newBonus)
             print(f"Now You working at {newName}!")
+            player.changedWork = True
             return time.sleep(2)
     def eventChooser(datafile):
         with open(datafile, "r") as outfile:
@@ -151,6 +226,7 @@ class Game:
                 choices=choices),]
             print(f"=Buy {type.capitalize()}=")
             answers = inq.prompt(questions)
+            del world.reference[type]["Not Now"]
             if answers["item"] == "Not Now":
                 return
             price = world.worldData[type][world.reference[type][answers["item"]]]["price"]
@@ -233,6 +309,7 @@ class Game:
 
     def work(player):
         player.vistedHospital = False
+        player.changedWork = False
         salary =  rnd.randint(math.ceil(player.work["salary"] - player.work["salary"]/8), math.ceil(player.work["salary"] + player.work["salary"]/8))
         bonus = player.workBonusLevel * player.work["bonus"]
         player.money += salary + bonus
@@ -247,6 +324,7 @@ class Game:
                 event = Game.eventChooser(f"Data{separator}events.json")[1]
             print(event["description"])
             values = {"hp": "Health", "money": "Money", "rep": "Reputation"}
+            what = values[event["type"]]
             print(values[event["type"]], "\n", event["result"])
             match event["type"]:
                 case "hp":
@@ -265,7 +343,13 @@ class Game:
                         player.rep = 50
                     elif player.rep < 0:
                         player.rep = 0
-
+        needFood = rnd.randint(1, 10)
+        if needFood >= 5:
+            foodPrice = rnd.randint(50, 150)
+            print(f"Today You were neened to buy some food, that costed {foodPrice}$")
+            player.money -= foodPrice
+            if player.money < 0:
+                player.money = 0
         input("Press enter to continue...")
 
     def nextDay(player):

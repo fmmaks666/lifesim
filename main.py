@@ -1,6 +1,7 @@
 #!/bin/python3
 import random as rnd
 import json as js
+import inquirer as inq
 import platform as plf
 from saving import Saving
 from game import Player, World, Game, Start
@@ -22,8 +23,15 @@ def main():
         player = Player(playerName, world.defWork)
         play = Game(player, world)
         play.Menu(player)
-
-
+        if player.dead:
+            print("You Died!")
+        elif player.ended:
+            print("Game Over!")
+        print(f"Reason: {player.deathReason}")
+        retry = inq.confirm("Would You to Retry?", default=False)
+        if retry:
+            Game.clear()
+            main()
 # Entry point
 if __name__ == "__main__":
     main()
