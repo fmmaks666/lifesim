@@ -27,7 +27,7 @@ class Player:
         self.name = name
         self.rep = rnd.randint(35, 50)
         self.money = rnd.randint(500, 2000)
-        self.money = 99999999999999999
+        #self.money = 99999999999999999
         self.age = rnd.randint(21, 35)
         self.hp = rnd.randint(1, 30)
         self.day = 0
