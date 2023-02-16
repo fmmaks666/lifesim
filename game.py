@@ -150,6 +150,9 @@ class Game:
             company =  world.worldData["donate"][world.reference["donate"][answers["item"]]]
             name = company["name"]
             doDonation = inq.confirm(f"Donate to {name}?", default=False)
+            if not doDonation:
+                print("You canceled Donation")
+                return time.sleep(2)
             validAmount = False
             while not validAmount:
                 money = [inq.Text("amount", message = "How many to donate?")]
@@ -170,6 +173,7 @@ class Game:
             if player.rep > 50:
                 player.rep = 50
             print("Donated Successful")
+            player.donated = True
             time.sleep(2)
     def changeWork(player, world):
         Game.clear()
