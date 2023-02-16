@@ -3,11 +3,13 @@
 # Changelog
 **16.02.2023**
 - Implemented Game Over
-- Implemented Donate System - Method to get Reputation 
+- Implemented Donate System - Method to get Reputation
+- Donate System is limited to 1 time per day
 - Minor Fixes & Improvements
 - Fixed in "Change Work"
 - 50% that Character will need to buy some food
-- "Change Work" now limited to 1 time per day
+- "Change Work" now limited to 1 time per day 
+
 **15.02.2023**
 - Implemented "Change Work"
 - Added "Not Now" option to all buy menus
