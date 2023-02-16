@@ -45,6 +45,7 @@ class Player:
         self.deathReason = ""
         self.vistedHospital = False
         self.changedWork = False
+        self.donated = False
         if len(defWork) != 0:
             self.works = []
             for work in defWork:
@@ -130,6 +131,9 @@ class Game:
     def donate(player, world):
         Game.clear()
         print("=Donate=")
+        if player.donated:
+            print("You can't donate 2 times")
+            return time.sleep(2)
         if player.money == 0:
             print("You don't have money")
             return time.sleep(2)
@@ -310,6 +314,7 @@ class Game:
     def work(player):
         player.vistedHospital = False
         player.changedWork = False
+        player.donated = False
         salary =  rnd.randint(math.ceil(player.work["salary"] - player.work["salary"]/8), math.ceil(player.work["salary"] + player.work["salary"]/8))
         bonus = player.workBonusLevel * player.work["bonus"]
         player.money += salary + bonus
