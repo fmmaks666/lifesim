@@ -26,51 +26,74 @@ if plf.system() == "Windows":
 # FIXME: Current Reputation bonus (Donate To) is very unbalanced, so it need to be balanced
 
 class Player:
-    def __init__(self, name, defWork):
-        self.name = name
-        self.rep = rnd.randint(35, 50)
-        self.money = rnd.randint(500, 2000)
+    def __init__(self, stats):
+        self.name = stats["name"]
+        self.rep = stats["rep"]
+        self.money = stats["money"]
         #elf.money = 99999999999999999
-        self.age = rnd.randint(21, 35)
-        self.hp = rnd.randint(1, 30)
-        self.day = 0
-        self.workexp = rnd.randint(0, 10)
-        self.workBonusLevel = 0
-        self.owned = {"cars": [], "phones": [], "houses": []}
-        self.cycles = {
-            "workcycle": 0,
-            "billcycle": 0,
-            "agecycle": 0,
-            "bonuscycle": 0,
-        }
-        self.deathchance = 0
-        self.ownedValue = 0
+        self.age = stats["age"]
+        self.hp = stats["hp"]
+        self.day = stats["day"]
+        self.workexp = stats["workexp"]
+        self.workBonusLevel = stats["workBonusLevel"]
+        self.owned = stats["owned"]
+        self.cycles = stats["cycles"]
+        self.deathchance = stats["deathchance"]
+        self.ownedValue = stats["ownedValue"]
+
+        # Not For Saving:
         self.dead = False
         self.ended = False
         self.deathReason = ""
-        self.vistedHospital = False
-        self.changedWork = False
-        self.donated = False
-        self.savingFirstTime = True
-        if len(defWork) != 0:
-            self.works = []
-            for work in defWork:
-                self.works.append(work)
-            self.work = defWork[self.works[rnd.randint(0, len(self.works) - 1)]]
-        else:
-            self.work = defWork
+
+        self.vistedHospital = stats["vistedHospital"]
+        self.changedWork = stats["changedWork"]
+        self.donated = stats["donated"]
+        self.savingFirstTime = stats["savingFirstTime"]
+        self.customSaveName = False
+        self.work = stats["work"]
 class Start:
-        # Donate To: Reputation Formula: Reputation*(Money/10000)*ReputationBonus
-    def generateNoLimit():
-        with open(datafile, "r") as outfile:
-            data = js.load(outfile)
-            outfile.close()
-        return data
+    # Donate To: Reputation Formula: Reputation*(Money/10000)*ReputationBonus
+    @staticmethod
     def generate(datafile):
             with open(datafile, "r") as outfile:
                 data = js.load(outfile)
-                outfile.close()
             return data
+    @staticmethod
+    def chooseWork(defWork):
+        if len(defWork) != 0:
+            works = []
+            for work in defWork:
+                works.append(work)
+            work = defWork[works[rnd.randint(0, len(works) - 1)]]
+            return work
+        else:
+            work = defWork
+            return work
+    @staticmethod
+    def generateWorldData(cars, phones, houses, works, donate):
+        things = [cars, phones, houses, works, donate]
+        thingsNames = ["cars", "phones", "houses", "works", "donate"]
+        worldData = {}
+        i = 0
+        for thing in things:
+            worldData[thingsNames[i]] = thing
+            i += 1
+        return worldData
+    @staticmethod
+    def generateReference(cars, phones, houses, works, donate):
+        things = [cars, phones, houses, works, donate]
+        i = 0
+        thingsNames = ["cars", "phones", "houses", "works", "donate"]
+        reference = {"cars": {}, "phones": {}, "houses": {}, "works": {}, "donate": {}}
+        for thing in things:
+            for entry in thing:
+                refThing = entry
+                refChange = reference.get(thingsNames[i])
+                refChange[thing[entry]["name"]] = refThing
+            if i != len(thingsNames) - 1:
+                i += 1
+        return reference
 class Game:
     def __init__(self, player, world):
         self.player = player
@@ -96,7 +119,20 @@ class Game:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 quit()
             elif answers["Choice"] == "Save":
-                Saving.save(player, "TestSave")
+                if not player.customSaveName:
+                    saveName = [inq.Text("saveName", message = "Enter save name")]
+                    saveName = inq.prompt(saveName)
+                    if saveName["saveName"].strip() == "":
+                        quit("Enter valid Name!")
+                    saveName = saveName["saveName"]
+                    if player.savingFirstTime:
+                        use = inq.confirm("Use this name by default?", default=True)
+                        if use:
+                            player.customSaveName = saveName
+                    else:
+                        saveName = player.customSaveName
+                player.savingFirstTime = False
+                Saving.save(self.player, self.world, saveName)
             elif answers["Choice"] == "Buy Cars":
                 Game.buy("cars", self.player, self.world)
             elif answers["Choice"] == "Buy Phones":
@@ -226,9 +262,9 @@ class Game:
                 bonus = ", without bonuses."
             else:
                 bonus = ", with bonuses."
+            print(f"I'm working at {name}, Averange salary is {salary}${bonus} My work experience is {player.workexp}")
             if player.changedWork:
                 return input("You can't change work 2 times, Press enter to continue...")
-            print(f"I'm working at {name}, Averange salary is {salary}${bonus} My work experience is {player.workexp}")
             choices = world.reference["works"]
             choices["Not Now"] = "close"
             questions = [
@@ -264,7 +300,7 @@ class Game:
     def eventChooser(datafile):
         with open(datafile, "r") as outfile:
             data = js.load(outfile)
-        outfile.close()
+
         return rnd.choice(list(data.items()))
     def buy(type, player, world):
         Game.clear()
@@ -417,24 +453,8 @@ class Game:
         Game.work(player)
 
 class World:
-    def __init__(self, cars, phones, houses, works, defWork, donate):
-        self.cars = cars
-        self.phones = phones
-        self.houses = houses
-        self.works = works
-        self.defWork = defWork
-        self.donate = donate
+    def __init__(self, worldData, reference, defWork):
         # TEMP: Reference Lists, to be fixed
-        self.things = [self.cars, self.phones, self.houses, self.works, self.donate]
-        self.i = 0
-        self.thingsNames = ["cars", "phones", "houses", "works", "donate"]
-        self.worldData = {}
-        self.reference = {"cars": {}, "phones": {}, "houses": {}, "works": {}, "donate": {}}
-        for thing in self.things:
-            self.worldData[self.thingsNames[self.i]] = thing
-            for entry in thing:
-                self.refThing = entry
-                self.refChange = self.reference.get(self.thingsNames[self.i])
-                self.refChange[thing[entry]["name"]] = self.refThing
-            if self.i != len(self.thingsNames) - 1:
-                self.i += 1
+        self.defWork = defWork
+        self.worldData = worldData
+        self.reference = reference
