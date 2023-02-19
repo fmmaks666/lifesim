@@ -1,6 +1,12 @@
 # lifesim
 (Unfinished) I'm new to Python, this project is just my testing field for json
-# Changelog
+# Changelo
+
+***
+
+**19.02.2023(Pre-Release)**
+- Implemented Cycles - Almost All in-game BG processes
+
 **16.02.2023**
 - Implemented Game Over
 - Implemented Donate System - Method to get Reputation
@@ -9,6 +15,8 @@
 - Fixed in "Change Work"
 - 50% that Character will need to buy some food
 - "Change Work" now limited to 1 time per day 
+
+***
 
 **15.02.2023**
 - Implemented "Change Work"
