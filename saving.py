@@ -5,6 +5,7 @@ separator = "/"
 if plf.system() == "Windows":
     separator = "\\"
 class Saving:
+    @staticmethod
     def save(player, saveName):
         saveData = {
             "name": player.name,
@@ -16,6 +17,7 @@ class Saving:
             }
         with open(f"Saves{separator}{saveName}.json", "w+") as outfile:
             outfile.write(js.dumps(saveData, indent = 4))
+    @staticmethod
     def load():
         # TODO: Implement Loadings
         pass

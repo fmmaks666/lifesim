@@ -7,11 +7,14 @@ import time
 import math
 from saving import Saving
 
-WORK_EXP_CYCLE = 4
-BILLS_CYCLE = 6
-AGE_CYCLE = 12
-WORK_BONUS_CYCLE = 2
-DEATH_CHANCE_BASE = 0
+
+MAX_CYCLE = {
+    "workcycle": 4,
+    "billcycle": 6,
+    "agecycle": 12,
+    "bonuscycle": 2
+}
+
 
 separator = "/"
 if plf.system() == "Windows":
@@ -27,25 +30,28 @@ class Player:
         self.name = name
         self.rep = rnd.randint(35, 50)
         self.money = rnd.randint(500, 2000)
-        #self.money = 99999999999999999
+        #elf.money = 99999999999999999
         self.age = rnd.randint(21, 35)
         self.hp = rnd.randint(1, 30)
         self.day = 0
         self.workexp = rnd.randint(0, 10)
-        self.workBonusLevel = 2
+        self.workBonusLevel = 0
         self.owned = {"cars": [], "phones": [], "houses": []}
-        self.ownedValue = 0
-        self.workcycle = 0
-        self.billcycle = 0
-        self.agecycle = 0
-        self.bonuscycle = 0
+        self.cycles = {
+            "workcycle": 0,
+            "billcycle": 0,
+            "agecycle": 0,
+            "bonuscycle": 0,
+        }
         self.deathchance = 0
+        self.ownedValue = 0
         self.dead = False
         self.ended = False
         self.deathReason = ""
         self.vistedHospital = False
         self.changedWork = False
         self.donated = False
+        self.savingFirstTime = True
         if len(defWork) != 0:
             self.works = []
             for work in defWork:
@@ -69,13 +75,15 @@ class Game:
     def __init__(self, player, world):
         self.player = player
         self.world = world
-
+    @staticmethod
     def clear():
         os.system('cls' if os.name == 'nt' else 'clear')
     def Menu(self, player):
         while True:
             Game.clear()
             isDead = Game.lifeCheck(self.player)
+            if not isDead:
+                isDead = Game.ageDeath(self.player)
             if isDead:
                 return
             print(f"{player.name} ->\nMoney: {player.money}$, Reputation: {player.rep}, Age: {player.age}, Health: {player.hp}, Day: {player.day}")
@@ -105,9 +113,37 @@ class Game:
                 Game.changeWork(self.player, self.world)
             elif answers["Choice"] == "Donate":
                 Game.donate(self.player, self.world)
+    def addCycle(player, type):
+        cycle = player.cycles[type]
+        maxValue = MAX_CYCLE[type]
+        if cycle == maxValue:
+            match type:
+                case "agecycle":
+                    player.age += 1
+                    player.rep -= rnd.randint(1, 5)
+                    if player.age >= 65:
+                        player.deathchance += rnd.randint(1, 3)
+                    if player.deathchance >= 99:
+                        player.deathchance == 99
+                    player.cycles[type] = 0
+                    return True
+                case "bonuscycle":
+                    player.workBonusLevel += 1
+                    player.cycles[type] = 0
+                    return True
+                case "workcycle":
+                    player.workexp += 1
+                    player.cycles[type] = 0
+                    return True
+                case "billcycle":
+                    player.cycles[type] = 0
+                    return rnd.randint(100, 250)
+        else:
+            player.cycles[type] += 1
+            return False
     def lifeCheck(player, fromAge = False):
         war = rnd.randint(1, 1000)
-        if war == 500:
+        if war == 666:
             player.deathReason = "Nuclear Warfare just started, You were killed by Explosion"
             player.dead = True
             return player.dead
@@ -175,6 +211,11 @@ class Game:
             print("Donated Successful")
             player.donated = True
             time.sleep(2)
+    def ageDeath(player):
+        if player.age >= 65:
+            chance = rnd.randint(0, 100)
+            if chance < player.deathchance:
+                return Game.lifeCheck(player, True)
     def changeWork(player, world):
         Game.clear()
         print("=Change Work=")
@@ -216,6 +257,7 @@ class Game:
             player.work["name"] = newName
             player.work["salary"] = int(newSalary)
             player.work["bonus"] = int(newBonus)
+            player.workBonusLevel = 0
             print(f"Now You working at {newName}!")
             player.changedWork = True
             return time.sleep(2)
@@ -359,6 +401,12 @@ class Game:
             player.money -= foodPrice
             if player.money < 0:
                 player.money = 0
+        for i in ["agecycle", "workcycle", "bonuscycle"]:
+            Game.addCycle(player, i)
+        bills = Game.addCycle(player, "billcycle")
+        if type(bills) == int:
+            print(f"Today I was neened to pay Bills, that was Cost {bills}$")
+            player.money -= bills
         input("Press enter to continue...")
 
     def nextDay(player):
