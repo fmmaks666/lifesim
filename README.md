@@ -1,6 +1,13 @@
 # lifesim
 (Unfinished) I'm new to Python, this project is just my testing field for json
+Almost done, but needs some Debug
 # Changelog
+
+**19.02.2023/2(Pre-Release 2)**
+- Implemented Saving and Loading
+- Code Optimizations
+
+****
 
 **19.02.2023(Pre-Release)**
 - Implemented Cycles - Almost All in-game BG processes
