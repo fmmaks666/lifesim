@@ -1,7 +1,15 @@
 # lifesim
-(Unfinished) I'm new to Python, this project is just my testing field for json
-Almost done, but needs some Debug
+I'm new to Python, this project is just my testing field for json
+Finished. Well, it's stil have problems with Balance. New releases could come some day
+
 # Changelog
+
+**20.02.2023(Release, version 1.0)**
+- Minor Fixes
+- Minor Imrovements
+- 
+
+***
 
 **19.02.2023/2(Pre-Release 2)**
 - Implemented Saving and Loading
