@@ -64,6 +64,8 @@ def main():
             "vistedHospital": False,
             "changedWork": False,
             "donated": False,
+            "customSaveName": False,
+            "enableNuclearWar": False,
             "savingFirstTime": True
         }
     player = Player(stats)
@@ -73,11 +75,11 @@ def main():
         print("You Died!")
     elif player.ended:
         print("Game Over!")
-        print(f"Reason: {player.deathReason}")
-        retry = inq.confirm("Would You to Retry?", default=False)
-        if retry:
-            Game.clear()
-            main()
+    print(f"Reason: {player.deathReason}")
+    retry = inq.confirm("Would You to Retry?", default=False)
+    if retry:
+        Game.clear()
+        main()
 # Entry point
 if __name__ == "__main__":
     main()

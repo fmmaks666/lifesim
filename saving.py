@@ -32,6 +32,7 @@ class Saving:
                 "vistedHospital": player.vistedHospital,
                 "changedWork": player.changedWork,
                 "donated": player.donated,
+                "enableNuclearWar": player.enableNuclearWar,
                 "customSaveName": player.customSaveName,
                 "savingFirstTime": False
             },

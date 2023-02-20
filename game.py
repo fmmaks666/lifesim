@@ -50,8 +50,9 @@ class Player:
         self.changedWork = stats["changedWork"]
         self.donated = stats["donated"]
         self.savingFirstTime = stats["savingFirstTime"]
-        self.customSaveName = False
+        self.customSaveName = stats["customSaveName"]
         self.work = stats["work"]
+        self.enableNuclearWar = stats["enableNuclearWar"]
 class Start:
     # Donate To: Reputation Formula: Reputation*(Money/10000)*ReputationBonus
     @staticmethod
@@ -119,18 +120,19 @@ class Game:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 quit()
             elif answers["Choice"] == "Save":
-                if not player.customSaveName:
-                    saveName = [inq.Text("saveName", message = "Enter save name")]
-                    saveName = inq.prompt(saveName)
-                    if saveName["saveName"].strip() == "":
+                if type(player.customSaveName) != str:
+                    saveText = [inq.Text("saveName", message = "Enter save name")]
+                    saveGet = inq.prompt(saveText)
+                    if saveGet["saveName"].strip() == "":
                         quit("Enter valid Name!")
-                    saveName = saveName["saveName"]
+                    saveName = saveGet["saveName"]
                     if player.savingFirstTime:
                         use = inq.confirm("Use this name by default?", default=True)
                         if use:
                             player.customSaveName = saveName
-                    else:
-                        saveName = player.customSaveName
+                    saveName = saveName
+                else:
+                    saveName = player.customSaveName
                 player.savingFirstTime = False
                 Saving.save(self.player, self.world, saveName)
             elif answers["Choice"] == "Buy Cars":
@@ -179,7 +181,7 @@ class Game:
             return False
     def lifeCheck(player, fromAge = False):
         war = rnd.randint(1, 1000)
-        if war == 666:
+        if war == 666 and player.enableNuclearWar:
             player.deathReason = "Nuclear Warfare just started, You were killed by Explosion"
             player.dead = True
             return player.dead
