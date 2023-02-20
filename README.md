@@ -7,7 +7,6 @@ Finished. Well, it's stil have problems with Balance. New releases could come so
 **20.02.2023(Release, version 1.0)**
 - Minor Fixes
 - Minor Imrovements
-- 
 
 ***
 
