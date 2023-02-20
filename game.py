@@ -20,7 +20,6 @@ separator = "/"
 if plf.system() == "Windows":
     separator = "\\"
 
-# TODO: Finish Project!!
 # TODO: Make better balance
 # OPTIMIZE: Shops, Work, Donate: Get Rid of "Reference Lists", Transfer some if .. else to match .. case
 # FIXME: Current Reputation bonus (Donate To) is very unbalanced, so it need to be balanced
