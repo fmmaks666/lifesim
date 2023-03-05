@@ -1,6 +1,9 @@
-# lifesim
+# LifeSim
+
 I'm new to Python, this project is just my testing field for json
 Finished. Well, it's stil have problems with Balance. New releases could come some day
+- [x] Core Mechanics
+- [ ] Rebalancing
 
 # Changelog
 
@@ -38,4 +41,4 @@ Finished. Well, it's stil have problems with Balance. New releases could come so
 - Changed Max HP&Reputation: Now Max Health is 30, and Max Reputation is 50, low reputation is 25
 - Healing at Hospital are now limited to 1 time per day
 - Added new healing Options to Hospital
-- New Phones, Thanks to @D__a@mastodon.social 
+- New Phones, Thanks to [@D__a](https://mstdn.social/@D__a@mastodon.social) 
